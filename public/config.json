@@ -1,0 +1,7 @@
+{
+  "api_base_url": "https://script.google.com/macros/s/AKfycbzeqxgcOQfRAewXd9Sd9yjB_CuWybZTfeyZciqBnuchdysBcm1xnI7QIb7FgKVtQFH-bA/exec",
+  "site_title": "互動式影片活動",
+  "site_description": "觀看影片並為您最喜愛的影片點讚",
+  "max_likes_per_user": 10,
+  "enable_like_limit": true
+}
