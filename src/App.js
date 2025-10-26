@@ -42,11 +42,11 @@ function App() {
   /**
    * Handle like updates from VideoCard components
    */
-  const handleLikeUpdate = (youtubeId, newLikeCount) => {
+  const handleLikeUpdate = (youtubeId, newWebLikes, newTotalLikes) => {
     setVideos(prevVideos =>
       prevVideos.map(video =>
         video.youtube_id === youtubeId
-          ? { ...video, likes: newLikeCount }
+          ? { ...video, web_likes: newWebLikes, total_likes: newTotalLikes }
           : video
       )
     );

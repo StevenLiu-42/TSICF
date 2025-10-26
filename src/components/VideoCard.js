@@ -7,7 +7,8 @@ import { submitLike } from '../services/api';
  * Displays a single video card with thumbnail, like count, and action buttons
  */
 const VideoCard = ({ video, config, onLikeUpdate }) => {
-  const [likes, setLikes] = useState(video.likes || 0);
+  const [webLikes, setWebLikes] = useState(video.web_likes || 0);
+  const [totalLikes, setTotalLikes] = useState(video.total_likes || 0);
   const [isLiked, setIsLiked] = useState(hasLiked(video.youtube_id));
   const [isLoading, setIsLoading] = useState(false);
   const [showMessage, setShowMessage] = useState('');
@@ -43,7 +44,8 @@ const VideoCard = ({ video, config, onLikeUpdate }) => {
       const result = await submitLike(video.youtube_id);
       
       // Update local state
-      setLikes(result.likes);
+      setWebLikes(result.web_likes);
+      setTotalLikes(result.total_likes);
       setIsLiked(true);
       addLike(video.youtube_id);
       
@@ -52,7 +54,7 @@ const VideoCard = ({ video, config, onLikeUpdate }) => {
 
       // Notify parent component
       if (onLikeUpdate) {
-        onLikeUpdate(video.youtube_id, result.likes);
+        onLikeUpdate(video.youtube_id, result.web_likes, result.total_likes);
       }
     } catch (error) {
       setShowMessage('點讚失敗，請稍後再試');
@@ -69,20 +71,57 @@ const VideoCard = ({ video, config, onLikeUpdate }) => {
         <img
           src={thumbnailUrl}
           className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
-          alt={`Video ${video.youtube_id}`}
+          alt={video.name || `Video ${video.youtube_id}`}
           onError={(e) => {
             e.target.src = `https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`;
           }}
         />
-        {/* Like Badge */}
+        {/* Like Badge - Shows Total Likes */}
         <div className="position-absolute top-0 end-0 m-3 bg-dark bg-opacity-75 text-white px-3 py-2 rounded-pill">
           <i className="bi bi-heart-fill text-danger me-2"></i>
-          <span className="fw-bold">{likes}</span>
+          <span className="fw-bold">{totalLikes}</span>
         </div>
+        {/* Video Name Badge */}
+        {video.name && (
+          <div className="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white px-3 py-2">
+            <small className="fw-semibold">{video.name}</small>
+          </div>
+        )}
       </div>
 
       {/* Card Body */}
       <div className="card-body d-flex flex-column">
+        {/* Like Statistics */}
+        <div className="mb-3">
+          <div className="d-flex justify-content-between align-items-center small text-muted mb-2">
+            <span>
+              <i className="bi bi-hand-thumbs-up me-1"></i>
+              網頁: <strong className="text-primary">{webLikes}</strong>
+            </span>
+            {video.youtube_likes > 0 && (
+              <span>
+                <i className="bi bi-youtube me-1 text-danger"></i>
+                <strong>{video.youtube_likes}</strong>
+              </span>
+            )}
+            {video.facebook_likes > 0 && (
+              <span>
+                <i className="bi bi-facebook me-1 text-primary"></i>
+                <strong>{video.facebook_likes}</strong>
+              </span>
+            )}
+          </div>
+          <div className="progress" style={{ height: '4px' }}>
+            <div 
+              className="progress-bar bg-primary" 
+              role="progressbar" 
+              style={{ width: `${totalLikes > 0 ? (webLikes / totalLikes * 100) : 0}%` }}
+              aria-valuenow={webLikes} 
+              aria-valuemin="0" 
+              aria-valuemax={totalLikes}
+            ></div>
+          </div>
+        </div>
         {/* Message Display */}
         {showMessage && (
           <div className={`alert ${isLiked && showMessage.includes('感謝') ? 'alert-success' : 'alert-warning'} alert-dismissible fade show py-2`} role="alert">
